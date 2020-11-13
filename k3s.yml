@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+
+    - name: create temp dir
+      file: 
+        state: directory
+        path: /tmp/k3sinstall
+    
+    - name: download k3s script
+      get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3sinstall/install
+        mode: 0770
+
+    - name: install
+      command: sh /tmp/k3sinstall/install
+      environment:
+        K3S_URL: "{{ k3s_url }}"
+        K3S_TOKEN: "{{ k3s_token }}"
+        K3S_NODE_NAME: "{{ inventory_hostname }}"

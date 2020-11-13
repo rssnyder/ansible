@@ -1,0 +1,37 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install ddclient
+      apt:
+        name: ddclient
+        state: latest
+        update_cache: yes
+
+    - name: install libio-socket-ssl-perl
+      apt:
+        name: libio-socket-ssl-perl
+        state: latest
+        update_cache: yes
+
+    - name: copy domain config
+      template: 
+        src: templates/ddclient.conf.j2
+        dest: /etc/ddclient.conf
+
+    - name: start ddclient
+      systemd:
+        state: started
+        name: ddclient
+
+    - name: enable ddclient
+      systemd:
+        enabled: yes
+        name: ddclient
+
+    - name: update ip cron
+      cron:
+        name: "update ip"
+        minute: "10"
+        hour: "*"
+        job: "/usr/sbin/ddclient -force"

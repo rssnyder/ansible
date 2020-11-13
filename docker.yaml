@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install docker
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+
+    - name: install docker compose
+      apt:
+        name: docker-compose
+        state: latest
+        update_cache: yes
+
+    - name: copy docker compose
+      copy:
+        src: templates/docker-compose.yml
+        dest: /root/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: start docker stack
+      shell: docker-compose up -d
+      args:
+        chdir: /root

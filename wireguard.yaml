@@ -1,0 +1,31 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install wireguard
+      apt:
+        name: wireguard
+        state: latest
+        update_cache: yes
+
+    - name: copy wireguard config
+      template: 
+        src: templates/cornelius.conf.j2
+        dest: "/etc/wireguard/cornelius.conf"
+
+    - name: start wireguard
+      systemd:
+        state: started
+        name: wg-quick@cornelius
+
+    - name: enable wireguard
+      systemd:
+        enabled: yes
+        name: wg-quick@cornelius
+
+    - name: update wg cron
+      cron:
+        name: "update wg"
+        minute: "10"
+        hour: "*"
+        job: "systemctl restart wg-quick@cornelius.service"

@@ -1,0 +1,62 @@
+---
+- hosts: minio
+  become: yes
+  tasks:
+    - name: Allow all access to minio
+      ufw:
+        rule: allow
+        port: "{{ port }}"
+        proto: tcp
+
+    - name: Deny all others
+      ufw:
+        default: deny
+
+    - name: Add the minio user
+      user:
+        name: minio-user
+
+    - name: Download minio
+      get_url:
+        url: https://dl.min.io/server/minio/release/linux-amd64/minio
+        dest: /usr/local/bin/minio
+        owner: minio-user
+        group: minio-user
+        mode: '0700'
+    
+    - name: Generate minio access key
+      shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 16 ; echo ''
+      register: minio_key
+
+    - name: Generate minio access key
+      shell: head /dev/urandom | tr -dc 'A-Za-z0-9!#$%&\()*+,-./:;<=>?@^_{|}~' | head -c 32 ; echo ''
+      register: minio_secret
+
+    - name: Set minio options
+      template: 
+        src: templates/minio.conf.j2
+        dest: "/etc/default/minio"
+        owner: minio-user
+        group: minio-user
+        mode: '0600'
+
+    - name: Download minio service file
+      get_url:
+        url: https://raw.githubusercontent.com/minio/minio-service/master/linux-systemd/minio.service
+        dest: /etc/systemd/system/minio.service
+        owner: minio-user
+        group: minio-user
+        mode: '0700'
+
+    - name: Enable minio
+      systemd:
+        enabled: yes
+        name: minio
+
+    - name: Start minio
+      systemd:
+        state: started
+        name: minio
+
+    - debug:
+        msg: "Key: {{ minio_key.stdout }} Secret: {{ minio_secret.stdout }}"

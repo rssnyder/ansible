@@ -1,0 +1,10 @@
+[Interface]
+PrivateKey={{ wg_private_key }}
+Address=10.253.0.{{ wg_id }}/32
+
+[Peer]
+PresharedKey={{ wg_shared_key }}
+PublicKey={{ wg_public_key }}
+Endpoint=cornelius.rileysnyder.org:51820
+AllowedIPs=10.253.0.0/24
+PersistentKeepalive=15
