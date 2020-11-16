@@ -54,6 +54,6 @@ all:
           wg_private_key: <redacted> 
           wg_shared_key: <redacted> 
         oc1:
-          ansible_host: oc0.rileysnyder.org
+          ansible_host: oc1.rileysnyder.org
           ...
 ```

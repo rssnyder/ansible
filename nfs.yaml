@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install utils
+      apt:
+        name: nfs-common
+        state: latest
+        update_cache: yes
+  
+    - name: mount media share
+      mount:
+        fstype: nfs
+        opts: defaults
+        dump: 0
+        passno: 0
+        state: mounted
+        src: 10.253.0.1:/mnt/user/Media
+        path: /mnt/media
