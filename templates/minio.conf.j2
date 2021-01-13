@@ -1,4 +1,4 @@
-MINIO_VOLUMES="{{ storage_dir }}"
-MINIO_OPTS="--address :{{ port }}"
+MINIO_VOLUMES="{{ minio_dir }}"
+MINIO_OPTS="--address :{{ minio_port }}"
 MINIO_ACCESS_KEY="{{ minio_key.stdout }}"
 MINIO_SECRET_KEY="{{ minio_secret.stdout }}"

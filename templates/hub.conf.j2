@@ -1,0 +1,23 @@
+[Interface]
+#{{ dns_domain }}
+PrivateKey={{ wg_private_key }}
+Address=10.{{ wg.network }}.0.1
+ListenPort={{ wg.port }}
+PostUp=logger -t wireguard 'Tunnel WireGuard {{ dns_domain }} started'
+PostUp=iptables -t nat -A POSTROUTING -s 10.253.0.0/24 -o br0 -j MASQUERADE
+PostDown=logger -t wireguard 'Tunnel WireGuard {{ dns_domain }} stopped'
+PostDown=iptables -t nat -D POSTROUTING -s 10.253.0.0/24 -o br0 -j MASQUERADE
+
+[Peer]
+#cornelius
+PublicKey=gs9NTjL63kcsuO4dL3zLTqe1Abekq8iwrW4f1kT2DFY=
+AllowedIPs=10.253.0.2
+
+{% for peer in groups['oracle'] %}
+{% if 'wg_private_key' in hostvars[peer] %}
+[Peer]
+#{{ peer }}
+PublicKey={{ hostvars[peer]['wg_public_key'] }}
+AllowedIPs=10.{{ wg.network }}.0.{{ hostvars[peer]['wg_id'] }}
+{% endif %}
+{% endfor %}

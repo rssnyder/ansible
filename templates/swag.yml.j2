@@ -1,0 +1,22 @@
+---
+version: "2"
+services:
+  swag:
+    image: linuxserver/swag
+    container_name: swag
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - URL={{ dns_domain }}.rileysnyder.org
+      - VALIDATION=http
+      - EMAIL=rileysndr@gmail.com
+    volumes:
+      - /root/docker/appdata/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped

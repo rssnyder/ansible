@@ -1,0 +1,13 @@
+[Interface]
+PrivateKey={{ wg_private_key }}
+Address=10.{{ wg.network }}.0.{{ wg_id }}/32
+
+[Peer]
+PublicKey={{ wg.public_key }}
+{% if wg_local -%}
+Endpoint=192.168.0.4:{{ wg.port }}
+{% else -%}
+Endpoint={{ wg.hostname }}:{{ wg.port }}
+{% endif %}
+AllowedIPs=10.{{ wg.network }}.0.0/24
+PersistentKeepalive=15

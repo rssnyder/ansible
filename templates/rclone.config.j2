@@ -1,0 +1,12 @@
+[nicole-gdrive]
+type = drive
+token = {"access_token":"{{ rclone.token }}","token_type":"Bearer","refresh_token":"{{ rclone.refresh }}","expiry":"2020-11-16T10:57:19.378255575-06:00"}
+root_folder_id = 0AL1R-SoGHcZcUk9PVA
+
+[crypt]
+type = crypt
+remote = nicole-gdrive:riley
+filename_encryption = standard
+directory_name_encryption = true
+password = {{ rclone.password }}
+password2 = {{ rclone.password2 }}
