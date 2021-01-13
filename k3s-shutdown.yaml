@@ -1,0 +1,14 @@
+---
+- hosts: cloud
+  become: yes
+  tasks:
+    - name: stop k3s-agent
+      systemd:
+        state: stopped
+        name: k3s-agent
+
+    - name: stop rclone
+      systemd:
+        state: stopped
+        name: rclone
+

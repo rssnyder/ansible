@@ -1,16 +1,12 @@
 ---
-- hosts: minio
+- hosts: all
   become: yes
   tasks:
     - name: Allow all access to minio
       ufw:
         rule: allow
-        port: "{{ port }}"
+        port: "{{ minio_port }}"
         proto: tcp
-
-    - name: Deny all others
-      ufw:
-        default: deny
 
     - name: Add the minio user
       user:
@@ -47,6 +43,13 @@
         owner: minio-user
         group: minio-user
         mode: '0700'
+    
+    - name: create minio dir
+      file: 
+        state: directory
+        path: "{{ minio_dir }}"
+        owner: minio-user
+        group: minio-user
 
     - name: Enable minio
       systemd:

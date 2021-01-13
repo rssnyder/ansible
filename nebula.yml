@@ -1,0 +1,57 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: create nebula dir
+      file: 
+        state: directory
+        path: /etc/nebula
+        owner: root
+        group: root
+
+    - name: Download nebula
+      get_url:
+        url: https://github.com/slackhq/nebula/releases/download/v1.3.0/nebula-linux-amd64.tar.gz
+        dest: /etc/nebula/nebula-linux-amd64.tar.gz
+        mode: '0700'
+    
+    - name: Extract nebula
+      unarchive:
+        remote_src: yes
+        src: /etc/nebula/nebula-linux-amd64.tar.gz
+        dest: /etc/nebula/
+    
+    - name: copy nebula config
+      template: 
+        src: nebula/node.yml
+        dest: /etc/nebula/config.yml
+    
+    - name: copy nebula crt
+      template: 
+        src: nebula/{{ inventory_hostname }}.crt
+        dest: /etc/nebula/host.crt
+    
+    - name: copy nebula key
+      template: 
+        src: nebula/{{ inventory_hostname }}.key
+        dest: /etc/nebula/host.key
+
+    - name: copy nebula ca crt
+      template: 
+        src: nebula/ca.crt
+        dest: /etc/nebula/ca.crt
+    
+    - name: copy nebula ca crt
+      template: 
+        src: nebula/nebula.service
+        dest: /etc/systemd/system/nebula.service
+    
+    - name: Enable nebula
+      systemd:
+        enabled: yes
+        name: nebula
+
+    - name: Start nebula
+      systemd:
+        state: started
+        name: nebula

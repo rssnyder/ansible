@@ -1,0 +1,31 @@
+---
+- hosts: cloud
+  become: yes
+  tasks:
+  
+    - name: install docker
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+
+    - name: install docker compose
+      apt:
+        name: docker-compose
+        state: latest
+        update_cache: yes
+    
+    - name: create swag docker dir
+      file: 
+        state: directory
+        path: /root/docker/appdata/swag
+    
+    - name: copy docker config
+      template: 
+        src: templates/swag.yml.j2
+        dest: /root/docker/appdata/swag/docker-compose.yml
+
+    - name: start docker stack
+      shell: docker-compose up -d
+      args:
+        chdir: /root/docker/appdata/swag

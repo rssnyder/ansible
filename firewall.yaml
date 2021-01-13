@@ -15,25 +15,30 @@
     - name: Set logging
       ufw:
         logging: 'on'
-
-    - name: Allow all access to tcp port 80
-      ufw:
-        rule: allow
-        port: '80'
-        proto: tcp
-
-    - name: Allow all access to tcp port 443
-      ufw:
-        rule: allow
-        port: '443'
-        proto: tcp
         
-    - name: Allow all access to tcp port 22
+    - name: Allow all access to tcp ports
       ufw:
         rule: allow
-        port: '22'
+        port: "{{ item }}"
         proto: tcp
+      with_items:  [ '80', '22', '443' ]
 
     - name: Deny all others
       ufw:
         default: deny
+    
+    - name: Forward FORWARD
+      iptables:
+        policy: ACCEPT
+        chain: "{{ item }}"
+      with_items:  [ 'INPUT', 'OUTPUT', 'FORWARD' ]
+    
+    # - name: Iptables flush filter
+    #   iptables:
+    #     flush: yes
+    
+    - name: restart firewall
+      systemd:
+        state: restarted
+        name: "{{ item }}"
+      with_items:  [ 'ufw' ]

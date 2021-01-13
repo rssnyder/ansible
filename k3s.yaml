@@ -20,3 +20,13 @@
         K3S_URL: "{{ k3s_url }}"
         K3S_TOKEN: "{{ k3s_token }}"
         K3S_NODE_NAME: "{{ inventory_hostname }}"
+    
+    - name: start k3s-agent
+      systemd:
+        state: started
+        name: k3s-agent
+    
+    - name: enable k3s-agent
+      systemd:
+        enabled: yes
+        name: k3s-agent

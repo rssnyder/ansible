@@ -1,6 +1,7 @@
 - name: Fetch a backup of a postgres DB that runs on a remote docker container
-  hosts: linode
+  hosts: library
   gather_facts: yes
+  become: yes
 
   tasks:
     - name: Set backup_dir and db_dump_name variable
@@ -10,14 +11,12 @@
         local_backup_dir: /home/riley/Documents
 
     - name: Make sure backup directory exists on the local machine
-      delegate_to: localhost
-      become: no
       file:
         state: directory
         path: "{{ backup_dir }}"
 
     - name: Dump the DB to a bind-mounted volume
-      command: docker exec -i --user postgres librarydb bash -c "pg_dump -Fc library" > "{{ backup_dir }}/{{ db_dump_name }}"
+      command: docker exec -i --user postgres librarydb bash -c "pg_dump -Fc library" > /tmp/ps.bkup
 
     - name: Fetch the dumped DB from remote to local
       fetch:

@@ -1,0 +1,15 @@
+---
+- hosts: library
+  become: yes
+  tasks:
+
+    - name: Add the library user
+      user:
+        name: librarian
+
+    - name: Allow all access to tcp ports
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      with_items:  [ '8080' ]

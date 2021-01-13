@@ -1,0 +1,58 @@
+---
+- hosts: library
+  become: yes
+  tasks:
+    
+    - name: Allow all access to minio
+      ufw:
+        rule: allow
+        port: "{{ minio_port }}"
+        proto: tcp
+
+    - name: install docker
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+
+    - name: install docker compose
+      apt:
+        name: docker-compose
+        state: latest
+        update_cache: yes
+
+    - name: copy docker compose
+      template:
+        src: "templates/{{ dns_domain }}.yml.j2"
+        dest: /root/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: start docker stack
+      shell: docker-compose up -d --remove-orphans
+      args:
+        chdir: /root
+    
+    - name: install utils
+      apt:
+        name: nfs-common
+        state: latest
+        update_cache: yes
+    
+    - name: create media dir
+      file: 
+        state: directory
+        path: "{{ media_dir }}"
+    
+    - name: mount media share
+      mount:
+        fstype: nfs
+        opts: defaults
+        dump: 0
+        passno: 0
+        state: mounted
+        src: 10.253.0.1:/mnt/user/Media
+        path: "{{ media_dir }}"
+
+        

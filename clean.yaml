@@ -1,0 +1,37 @@
+---
+- hosts: cloud
+  become: yes
+  tasks:
+
+    - name: unmount snap
+      shell: umount /snap/core* -lf
+      ignore_errors: yes
+  
+    - name: Remove oracle-cloud-agent
+      community.general.snap:
+        name: oracle-cloud-agent
+        state: absent
+      ignore_errors: yes
+    
+    - name: Remove lxd
+      community.general.snap:
+        name: lxd
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove core18
+      community.general.snap:
+        name: core18
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove snapd
+      community.general.snap:
+        name: snapd
+        state: absent
+      ignore_errors: yes
+    
+    - name: remove snap
+      apt:
+        name: snapd
+        state: absent

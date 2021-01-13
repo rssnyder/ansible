@@ -1,0 +1,65 @@
+---
+- hosts: desoto
+  become: yes
+  tasks:
+
+    - name: install utils
+      apt:
+        name: nfs-common
+        state: latest
+        update_cache: yes
+
+    - name: create scott dir
+      file: 
+        state: directory
+        path: /mnt/scott
+    
+    - name: mount cache share
+      mount:
+        fstype: nfs
+        opts: defaults
+        dump: 0
+        passno: 0
+        state: mounted
+        src: 192.168.20.10:/volume1/Scott-Snyder
+        path: /mnt/scott
+    
+    - name: create backup dir
+      file: 
+        state: directory
+        path: /mnt/backup
+    
+    - name: mount cache share
+      mount:
+        fstype: nfs
+        opts: defaults
+        dump: 0
+        passno: 0
+        state: mounted
+        src: 192.168.20.10:/volume1/Backup
+        path: /mnt/backup
+    
+    - name: install docker
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+
+    - name: install docker compose
+      apt:
+        name: docker-compose
+        state: latest
+        update_cache: yes
+
+    - name: copy docker compose
+      copy:
+        src: templates/desoto.yml
+        dest: /root/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: start docker stack
+      shell: docker-compose up -d
+      args:
+        chdir: /root
